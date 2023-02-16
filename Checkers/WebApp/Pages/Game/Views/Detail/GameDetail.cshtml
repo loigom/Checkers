@@ -1,0 +1,107 @@
+﻿@using Entities
+@model IndexModel
+
+<div id="gameScreen">
+@{ await Html.RenderPartialAsync("Views/Detail/GameDetailBoard", Model); }
+</div>
+
+@{
+    if (!Model.LatestState!.Finished())
+    {
+        <h4>Make move:</h4>
+        <form method="post">
+            <input name="origin" type="hidden" value="@Model.GameId">
+            @{
+                if (Model.LatestState!.Turn == EPieceType.Black &&
+                    Model.LatestState!.Game.Options.GameType == EGameType.HumanVsAi ||
+                    Model.LatestState!.Game.Options.GameType == EGameType.AiVsAi)
+                {
+                    <input type="submit" value="Make AI move">
+                }
+                else
+                {
+                    <input id="moveFrom" type="text" name="moveFrom" placeholder="From">
+                    <input id="moveTo" type="text" name="moveTo" placeholder="To">
+                    <input type="submit" value="Make move">
+                }
+            }
+        </form>
+    }
+}
+
+@{
+    var states = Model.DbManager.ListStatesForGameId((int)Model.GameId!);
+}
+
+<h4>History</h4>
+
+
+<div id="historyScreen">
+    @{
+        if (states is {Length: > 0 })
+        {
+            foreach (var state in states)
+            {
+                <div id="@state.Id" hidden>
+                    @{
+                        Model.HistoryStateToUse = state;
+                        await Html.RenderPartialAsync("Views/Detail/GameDetailBoard", Model);
+                    }
+                </div>
+            }
+        }
+    }
+</div>
+
+
+<select id="historySelector">
+
+    <option></option>
+    @{
+        if (states is {Length: > 0 })
+        {
+            var i = 0;
+            foreach (var state in states)
+            {
+                <option value="@state.Id">@i</option>
+                i++;
+            }
+        }
+    }
+</select>
+
+<script>
+    let gameScreen = document.getElementById("gameScreen");
+    let rows = gameScreen.getElementsByTagName("tr");
+    let fields = [document.getElementById("moveFrom"), document.getElementById("moveTo")];
+    let backlog = [null, null];
+    let flip = 0;
+    
+    for (let y = 1; y < rows.length; y++) {
+        let cells = rows[y].getElementsByTagName("th");
+        for (let x = 1; x < cells.length; x++) {
+            cells[x].onclick = function (event) {
+                if (backlog[flip] !== null) {
+                    backlog[flip].style.border = "";
+                }
+                event.target.style.border = "1px solid green";
+                backlog[flip] = event.target;
+                let rowValue = String.fromCharCode("A".charCodeAt(0) + x - 1);
+                fields[flip].setAttribute("value", rowValue + (y - 1).toString());
+                flip = (flip + 1) % 2;
+            }
+        }
+    }
+    
+    let historySelector = document.getElementById("historySelector");
+    let historyScreen = document.getElementById("historyScreen");
+    historySelector.oninput = function() {
+        let divs = historyScreen.getElementsByTagName("div");
+        let idSelected = historySelector.value;
+        
+        for (let i = 0; i < divs.length; i++) {
+            divs[i].hidden = divs[i].id.toString() !== idSelected.toString();
+        }
+        
+    }
+</script>

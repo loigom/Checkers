@@ -1,0 +1,34 @@
+﻿@page
+@model WebApp.Pages.Game.IndexModel
+
+<h4>Make a new game:</h4>
+<form method="post">
+    <input name="origin" type="hidden" value="new">
+    <table>
+        <tr>
+            <th>White moves first?</th>
+            <th><input type="checkbox" name="whiteMovesFirstField" checked></th>
+        </tr>
+        <tr>
+            <th>Dimensions</th>
+            <th>
+                <select id="dimensionsField" name="dimensionsField">
+                    <option value="8">8</option>
+                    <option value="10">10</option>
+                    <option value="12">12</option>
+                </select>
+            </th>
+        </tr>
+        <tr>
+            <th>Game type</th>
+            <th>
+                <select id="gameTypeField" name="gameTypeField">
+                    <option value="0">HumanVsHuman</option>
+                    <option value="1">HumanVsAi</option>
+                    <option value="2">AiVsAi</option>
+                </select>
+            </th>
+        </tr>
+    </table>
+    <input type="submit">
+</form>

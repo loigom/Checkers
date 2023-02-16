@@ -1,0 +1,29 @@
+@page "{gameId?}"
+@model IndexModel
+
+@{
+    var arg = (string?)RouteData.Values["gameId"];
+    var success = int.TryParse(arg, out var parsedId);
+    Model.GameId = success ? parsedId : null;
+
+    if (Model.Request.Query.TryGetValue("delete", out var deleteId))
+    {
+        Model.DbManager.DeleteGame(int.Parse(deleteId!));
+    }
+    
+    if (Model.Request.Query.TryGetValue("errMsg", out var errMsg))
+    {
+        <h4 style="color: red;">@errMsg</h4>
+    }
+
+    if (Model.GameId == null)
+    {
+        await Html.RenderPartialAsync("Views/List/GameList", Model.DbManager.GetAllGames());
+        await Html.RenderPartialAsync("Views/New", Model);
+    }
+    else
+    {
+        await Html.RenderPartialAsync("Views/Detail/GameDetail", Model);
+    }
+}
+

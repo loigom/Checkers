@@ -1,0 +1,18 @@
+﻿@model List<Entities.Game>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID (num)</th>
+        <th>Finished?</th>
+        <th>Dimensions</th>
+        <th>GameType</th>
+        <th>Delete?</th>
+    </tr>
+    </thead>
+    
+    <tbody>
+    @{ foreach (var game in Model) await Html.RenderPartialAsync("Views/List/GameListRow", game); }
+    </tbody>
+</table>
+

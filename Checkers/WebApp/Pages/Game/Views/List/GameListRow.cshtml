@@ -1,0 +1,9 @@
+﻿@model Entities.Game
+
+<tr>
+    <td><a href="Game/@Model.Id">@Model.Id</a></td>
+    <td>@Model.Finished</td>
+    <td>@Model.Options.Dimensions</td>
+    <td>@Model.Options.GameType.ToString()</td>
+    <td><a href="Game?delete=@Model.Id">Delete @Model.Id</a></td>
+</tr>

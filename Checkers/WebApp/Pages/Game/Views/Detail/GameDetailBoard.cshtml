@@ -1,0 +1,56 @@
+﻿@using Entities
+@model IndexModel
+
+@{
+    var game = Model.DbManager.GetGame((int)Model.GameId!);
+    if (game == null) throw new ApplicationException("Game shouldn't be null.");
+    GameState? state;
+    if (Model.HistoryStateToUse != null) state = Model.HistoryStateToUse;
+    else
+    {
+        state = Model.DbManager.LoadStateFromNum((int)Model.GameId);
+        Model.LatestState = state;
+    }
+}
+
+<table>
+    <thead>
+    <tr>
+        <th></th>
+        @for (var i = 'A'; i < game.Options.Dimensions + 'A'; i++)
+        {
+            <th>@i</th>
+        }
+    </tr>
+    </thead>
+    
+    <tbody>
+    @{
+        var board = new Board(state?.Squares ?? throw new InvalidOperationException());
+    }
+    @for (var y = 0; y < game.Options.Dimensions; y++)
+    {
+        <tr>
+            <th>@y</th>
+            @for (var x = 0; x < game.Options.Dimensions; x++)
+            {
+                var clz = (x + y) % 2 == 1 ? "style=background-color:beige;" : "";
+                var sq = board.SquareAt(x, y);
+                <th @clz>@{
+                             if (sq != null)
+                             {
+                                 var path = $"../img/{sq.PieceType.ToString().ToLower()}.png";
+                                 <img src='@path' alt="@sq.PieceType.ToString()">
+                             }
+                         }</th>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h4>Turn of: @state.Turn.ToString()</h4>
+
+@{
+    Model.HistoryStateToUse = null;
+}
